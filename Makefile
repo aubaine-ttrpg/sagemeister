@@ -2,7 +2,7 @@
 # Project name
 PROJECT = "sagemeister"
 # Docker-compose Dev file
-DOCKER_COMPOSE_DEV_FILE = "docker-compose.dev.yml"
+DOCKER_COMPOSE_DEV_FILE = "docker-compose.yml"
 # Use bash as the shell
 SHELL := /usr/bin/env bash
 
