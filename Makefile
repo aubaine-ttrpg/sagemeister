@@ -1,6 +1,6 @@
 # - Variables
 # Project name
-PROJECT = "ayyure"
+PROJECT = "sagemeister"
 # Docker-compose Dev file
 DOCKER_COMPOSE_DEV_FILE = "docker-compose.dev.yml"
 # Use bash as the shell
