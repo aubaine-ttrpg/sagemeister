@@ -5,7 +5,6 @@ A polyvalent tool to create Classes, Races, Jobs, and Lore for the Aubaine syste
 After installing everything using those commands:
 ```bash
 $ composer install
-$ npm install
 ```
 
 You can simply run the local server using:
