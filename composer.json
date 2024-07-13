@@ -12,6 +12,7 @@
         "symfony/flex": "^2",
         "symfony/framework-bundle": "7.1.*",
         "symfony/runtime": "7.1.*",
+        "symfony/ux-icons": "^2.18",
         "symfony/yaml": "7.1.*",
         "twig/twig": "^3.0"
     },
