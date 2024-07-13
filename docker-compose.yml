@@ -3,7 +3,6 @@ version: '3.8'
 services:
   db:
     image: mysql:8.4 # Latest secure version of MySQL
-    container_name: mysql
     restart: unless-stopped # Automatically restart the container unless it is stopped manually
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: 'yes' # Generate a random root password
@@ -24,7 +23,6 @@ services:
 
   adminer:
     image: adminer:latest # Latest secure version of Adminer
-    container_name: adminer
     restart: unless-stopped # Automatically restart the container unless it is stopped manually
     ports:
       - 8080:8080 # Expose Adminer web interface on port 8080
