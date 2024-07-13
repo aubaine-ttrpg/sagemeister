@@ -4,6 +4,16 @@
         <meta charset="UTF-8">
         <title>{% block title %}Welcome!{% endblock %}</title>
         <link rel="icon" href="{{ asset('favicon.webp') }}">
+        
+        {# Importing DaisyUI & Tailwind #}
+        <link
+            href="https://cdn.jsdelivr.net/npm/daisyui@2.6.0/dist/full.css"
+            rel="stylesheet"
+            type="text/css"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+        {# End of Importing DaisyUI & Tailwind #}
+
         {% block stylesheets %}
         {% endblock %}
 
