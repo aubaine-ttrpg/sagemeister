@@ -15,11 +15,19 @@ class AbilityTypeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name', TextType::class)
-            ->add('color', ColorType::class)
-            ->add('icon', TextType::class)
-            ->add('save', SubmitType::class)
-        ;
+            ->add('name', TextType::class, [
+                'label' => 'Name of the Ability Type',
+                'required' => true
+            ])
+            ->add('color', ColorType::class,  [
+                'label' => 'Color of the Ability Type',
+                'required' => true
+            ])
+            ->add('icon', TextType::class,  [
+                'label' => 'Icon of the Ability Type',
+                'required' => true
+            ])
+            ->add('save', SubmitType::class);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
