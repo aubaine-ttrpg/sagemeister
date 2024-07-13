@@ -19,6 +19,7 @@
         "symfony/form": "7.1.*",
         "symfony/framework-bundle": "7.1.*",
         "symfony/runtime": "7.1.*",
+        "symfony/string": "7.1.*",
         "symfony/twig-bundle": "7.1.*",
         "symfony/uid": "7.1.*",
         "symfony/ux-icons": "^2.18",
