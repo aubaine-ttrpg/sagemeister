@@ -52,7 +52,7 @@
                         tabindex="0"
                         class="menu menu-sm dropdown-content bg-base-200 w-52 shadow">
                         <li>
-                            <a href="/">
+                            <a href="{{ path("app_index") }}">
                                 Homepage
                             </a>
                         </li>
@@ -67,7 +67,7 @@
             </div>
 
             <div class="navbar-center">
-                <a href="/" class="flex justify-center items-center btn btn-ghost text-2xl">
+                <a href="{{ path("app_index") }}" class="flex justify-center items-center btn btn-ghost text-2xl">
                     <image class="rounded" width="35px" src="{{ asset('favicon.webp') }}"/>
                     <div>
                         Sagemeister
