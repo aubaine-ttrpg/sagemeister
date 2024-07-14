@@ -21,6 +21,18 @@ class AbilityTypeController extends AbstractController
         ]);
     }
 
+    #[Route('/list', name: 'list')]
+    public function list(
+        EntityManagerInterface $entityManager,
+    ): Response
+    {
+        $abilityTypes = $entityManager->getRepository(AbilityType::class)->findAll();
+        return $this->render('ability_type/list.html.twig', [
+            'controller_name' => 'AbilityTypeController',
+            'abilityTypes' => $abilityTypes,
+        ]);
+    }
+
     #[Route('/new', name: 'new')]
     public function new(
         Request $request,
