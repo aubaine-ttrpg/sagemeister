@@ -19,7 +19,7 @@ class AbilityTypeType extends AbstractType
                 'label' => 'Name of the Ability Type',
                 'required' => true
             ])
-            ->add('color', ColorType::class,  [
+            ->add('color', TextType::class,  [
                 'label' => 'Color of the Ability Type',
                 'required' => true
             ])
