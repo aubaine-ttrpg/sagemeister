@@ -44,11 +44,13 @@
                         </div>
                     </div>
                 </div>
-                {{ form_widget(form.icon, {
-                    'attr': {
-                        'class': 'w-80 input input-primary input-bordered max-w-xs'
-                    }})
-                }}
+            <select name="{{ field_name(form.icon) }}" class="form-control">
+                {% for label, value in field_choices(form.icon) %}
+                    <option style='background-image: url("data:image/svg+xml,{{ ux_icon(label) | base64_encode}}")' id="icon-option" value="{{ label }}">
+                            {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
             </div>
             <div class="w-full flex justify-between items-center">
                 {{ form_label(form.color) }}
