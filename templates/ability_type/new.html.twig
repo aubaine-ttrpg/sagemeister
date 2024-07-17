@@ -1,6 +1,16 @@
 {% extends 'base.html.twig' %}
 {% block title %}New Ability Type{% endblock %}
 
+{% block stylesheets %}
+<style>
+    {% for label, value in field_choices(form.icon) %}
+        .icon-{{ label | replace({':': '-'}) }} {
+            background-image: url('data:image/svg+xml,{{ ux_icon(label) | url_encode }}');
+        }
+    {% endfor %}
+</style>
+{% endblock %}
+
 {% block body %}
 {{ form_start(form) }}
     <div class="flex flex-col gap-3 justify-center items-center">
@@ -44,10 +54,10 @@
                         </div>
                     </div>
                 </div>
-            <select name="{{ field_name(form.icon) }}" class="form-control">
+            <select name="{{ field_name(form.icon) }}" class="w-80 input input-primary input-bordered max-w-xs form-control">
                 {% for label, value in field_choices(form.icon) %}
-                    <option style='background-image: url("data:image/svg+xml,{{ ux_icon(label) | base64_encode}}")' id="icon-option" value="{{ label }}">
-                            {{ label }}
+                    <option class="icon-{{ label | replace({':': '-'}) }}" id="icon-option" value="{{ label }}">
+                        {{ label }}
                     </option>
                 {% endfor %}
             </select>
