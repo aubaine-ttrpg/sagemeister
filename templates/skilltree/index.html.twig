@@ -1,20 +1,90 @@
 {# templates/skilltree/index.html.twig #}
-{% extends 'base.html.twig' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Skill Tree</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <h1 class="text-center text-xl font-bold my-4">{{ skilltree_name }}</h1>
 
-{% block title %}Skill Tree – {{ treeName }}{% endblock %}
-
-{% block body %}
-  <h1>{{ treeName }}</h1>
-
-  <h2>Capacities</h2>
-  {% if capacities is empty %}
-    <p><em>No capacities found for this tree.</em></p>
-  {% else %}
-    <ul>
-      {% for cap in capacities %}
-        {% set titleBlocks = cap.properties.Name.title ?? [] %}
-        <li>{{ titleBlocks[0].plain_text|default(cap.id) }}</li>
+  <div id="graph" class="relative mx-auto p-4 bg-white">
+    <svg id="edges" class="absolute inset-0 pointer-events-none z-0"></svg>
+    <div id="node-grid" class="grid grid-cols-4 grid-rows-5 auto-rows-min gap-4">
+      {# Render each node with its grid position and data-edges #}
+      {% for n in nodes %}
+        <div
+          class="bg-white border-2 border-gray-800 rounded p-2 text-center text-xs z-10"
+          style="grid-column-start: {{ n.x }}; grid-row-start: {{ n.y }};"
+          data-edges="{{ n.edges|join(',') }}"
+          data-name="{{ n.name }}"
+        >
+          {{ n.name }}
+        </div>
       {% endfor %}
-    </ul>
-  {% endif %}
-{% endblock %}
+    </div>
+  </div>
+
+    {# Pass the node list into JS for edge-drawing #}
+    <script>
+        const nodes = [
+            {% for n in nodes %}
+                {
+                    name: "{{ n.name|e('js') }}",
+                    edges: [{% for e in n.edges %}"{{ e|e('js') }}"{% if not loop.last %}, {% endif %}{% endfor %}],
+                }
+                {% if not loop.last %}, {% endif %}
+            {% endfor %}
+        ];
+
+        const graph = document.getElementById('graph');
+        const grid = document.getElementById('node-grid');
+        const svg = document.getElementById('edges');
+        const elementMap = {};
+
+        function computeCenters() {
+            const bounds = graph.getBoundingClientRect();
+
+            return Array.from(grid.children).reduce((map, el) => {
+                const name = el.getAttribute('data-name');
+                const r    = el.getBoundingClientRect();
+                map[name]   = {
+                x: r.left + r.width/2 - bounds.left,
+                y: r.top  + r.height/2 - bounds.top,
+                };
+                return map;
+            }, {});
+        }
+
+        function renderEdges() {
+            const bounds  = graph.getBoundingClientRect();
+            svg.setAttribute('width',  bounds.width);
+            svg.setAttribute('height', bounds.height);
+            svg.innerHTML = '';
+
+            const centers = computeCenters();
+            nodes.forEach(n => {
+                const from = centers[n.name];
+                n.edges.forEach(targetName => {
+                    const to = centers[targetName];
+                    if (!from || !to) return;
+
+                    const line = document.createElementNS(svg.namespaceURI, 'line');
+                    line.setAttribute('x1', from.x);
+                    line.setAttribute('y1', from.y);
+                    line.setAttribute('x2', to.x);
+                    line.setAttribute('y2', to.y);
+                    line.setAttribute('stroke', '#333');
+                    line.setAttribute('stroke-width', '2');
+                    svg.appendChild(line);
+                });
+            });
+        }
+
+        window.addEventListener('load',  () => requestAnimationFrame(renderEdges));
+        window.addEventListener('resize', () => requestAnimationFrame(renderEdges));
+    </script>
+</body>
+</html>
