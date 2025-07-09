@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Colonist: Scholar Talent Tree</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+  <h1 class="text-center text-xl font-bold my-4">Colonist: Scholar Talent Tree</h1>
+
+  <div id="graph" class="relative mx-auto p-4 bg-white">
+    <svg id="edges" class="absolute inset-0 pointer-events-none z-0"></svg>
+    <div id="node-grid" class="grid grid-cols-4 gap-4"></div>
+  </div>
+
+  <script>
+    const nodes = [
+      { name: "Respected Scholar I", x:1, y:1, edges:["Researcher I","Speaks Binary"] },
+      { name: "Researcher I", x:1, y:2, edges:["Codebreaker","Respected Scholar II"] },
+      { name: "Codebreaker", x:1, y:3, edges:["Knowledge Spec II","Knowledge Spec I"] },
+      { name: "Knowledge Spec II", x:1, y:4, edges:["Stroke of Genius","Intense Focus"] },
+      { name: "Stroke of Genius", x:1, y:5, edges:["Mental Fortress"] },
+      { name: "Speaks Binary", x:2, y:1, edges:["Respected Scholar II","Respected Scholar I","Grit"] },
+      { name: "Respected Scholar II",x:2, y:2, edges:["Knowledge Spec I","Researcher I","Resolve I"] },
+      { name: "Knowledge Spec I", x:2, y:3, edges:["Intense Focus","Codebreaker","Natural Scholar"] },
+      { name: "Intense Focus", x:2, y:4, edges:["Mental Fortress","Knowledge Spec II","Confidence"] },
+      { name: "Mental Fortress", x:2, y:5, edges:["Dedication","Stroke of Genius"] },
+      { name: "Grit", x:3, y:1, edges:["Resolve I","Speaks Binary","Brace"] },
+      { name: "Resolve I", x:3, y:2, edges:["Natural Scholar","Respected Scholar II","Researcher II"] },
+      { name: "Natural Scholar", x:3, y:3, edges:["Confidence","Knowledge Spec I","Well Rounded"] },
+      { name: "Confidence", x:3, y:4, edges:["Dedication","Intense Focus","Resolve II"] },
+      { name: "Dedication", x:3, y:5, edges:["Toughened","Mental Fortress"] },
+      { name: "Brace", x:4, y:1, edges:["Researcher II","Grit"] },
+      { name: "Researcher II", x:4, y:2, edges:["Well Rounded","Resolve I"] },
+      { name: "Well Rounded", x:4, y:3, edges:["Resolve II","Natural Scholar"] },
+      { name: "Resolve II", x:4, y:4, edges:["Toughened","Confidence"] },
+      { name: "Toughened", x:4, y:5, edges:["Dedication"] }
+    ];
+
+    const graph = document.getElementById('graph');
+    const grid = document.getElementById('node-grid');
+    const svg = document.getElementById('edges');
+    const elementMap = {};
+
+    function renderNodes() {
+      grid.innerHTML = '';
+      nodes.forEach(n => {
+        const div = document.createElement('div');
+        div.className = 'bg-white border-2 border-gray-800 rounded p-2 text-center text-xs z-10';
+        div.textContent = n.name;
+        div.style.gridColumnStart = n.x;
+        div.style.gridRowStart = n.y;
+        grid.appendChild(div);
+        elementMap[n.name] = div;
+      });
+    }
+
+    function renderEdges() {
+      const bounds = graph.getBoundingClientRect();
+      svg.setAttribute('width', bounds.width);
+      svg.setAttribute('height', bounds.height);
+      svg.setAttribute('viewBox', `0 0 ${bounds.width} ${bounds.height}`);
+      svg.innerHTML = '';
+      const centers = {};
+      Object.entries(elementMap).forEach(([name, el]) => {
+        const r = el.getBoundingClientRect();
+        centers[name] = {
+          x: r.left + r.width/2 - bounds.left,
+          y: r.top + r.height/2 - bounds.top
+        };
+      });
+      nodes.forEach(n => {
+        const from = centers[n.name];
+        n.edges.forEach(t => {
+          const to = centers[t];
+          if (!from || !to) return;
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('x1', from.x);
+          line.setAttribute('y1', from.y);
+          line.setAttribute('x2', to.x);
+          line.setAttribute('y2', to.y);
+          line.setAttribute('stroke', '#333');
+          line.setAttribute('stroke-width', '2');
+          svg.appendChild(line);
+        });
+      });
+    }
+
+    // Initial render
+    window.addEventListener('load', () => {
+      renderNodes();
+      renderEdges();
+
+      // Observe changes in node content or layout
+      const observer = new MutationObserver(() => renderEdges());
+      observer.observe(grid, { childList: true, subtree: true, characterData: true });
+
+      // Also update on resize
+      window.addEventListener('resize', renderEdges);
+    });
+  </script>
+</body>
+</html>
