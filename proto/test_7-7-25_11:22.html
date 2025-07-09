@@ -11,17 +11,17 @@
 
   <div id="graph" class="relative mx-auto p-4 bg-white">
     <svg id="edges" class="absolute inset-0 pointer-events-none z-0"></svg>
-    <div id="node-grid" class="grid grid-cols-4 gap-4"></div>
+    <div id="node-grid" class="grid grid-cols-4 grid-rows-5 auto-rows-min gap-4"></div>
   </div>
 
   <script>
     const nodes = [
-      { name: "Respected Scholar I", x:1, y:1, edges:["Researcher I","Speaks Binary"] },
+      { name: "Respected Scholar I", x:1, y:1, edges:["Researcher I"] },
       { name: "Researcher I", x:1, y:2, edges:["Codebreaker","Respected Scholar II"] },
       { name: "Codebreaker", x:1, y:3, edges:["Knowledge Spec II","Knowledge Spec I"] },
       { name: "Knowledge Spec II", x:1, y:4, edges:["Stroke of Genius","Intense Focus"] },
       { name: "Stroke of Genius", x:1, y:5, edges:["Mental Fortress"] },
-      { name: "Speaks Binary", x:2, y:1, edges:["Respected Scholar II","Respected Scholar I","Grit"] },
+      { name: "Speaks Binary", x:2, y:1, edges:["Respected Scholar II","Grit"] },
       { name: "Respected Scholar II",x:2, y:2, edges:["Knowledge Spec I","Researcher I","Resolve I"] },
       { name: "Knowledge Spec I", x:2, y:3, edges:["Intense Focus","Codebreaker","Natural Scholar"] },
       { name: "Intense Focus", x:2, y:4, edges:["Mental Fortress","Knowledge Spec II","Confidence"] },
@@ -90,15 +90,18 @@
     // Initial render
     window.addEventListener('load', () => {
       renderNodes();
-      renderEdges();
+      requestAnimationFrame(renderEdges);
 
-      // Observe changes in node content or layout
-      const observer = new MutationObserver(() => renderEdges());
+      // Observe changes in node content or layout and redraw edges
+      const observer = new MutationObserver(() => requestAnimationFrame(renderEdges));
       observer.observe(grid, { childList: true, subtree: true, characterData: true });
 
       // Also update on resize
-      window.addEventListener('resize', renderEdges);
+      window.addEventListener('resize', () => requestAnimationFrame(renderEdges));
     });
+
+      // Also update on resize
+      window.addEventListener('resize', renderEdges);
   </script>
 </body>
 </html>
