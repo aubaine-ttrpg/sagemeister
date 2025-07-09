@@ -15,13 +15,14 @@ class SkillTreeController extends AbstractController
     #[Route('/skilltree/{id}', name: 'skilltree')]
     public function index(string $id): Response
     {
+        // 1) Fetch the tree page to get its name
         $treePage = $this->notion->retrievePage($id);
-
         $titleBlocks = $treePage['properties']['Name']['title'] ?? [];
         $skilltreeName = count($titleBlocks)
             ? $titleBlocks[0]['plain_text']
             : $id;
 
+        // 2) Query capacities filtered & sorted
         $response = $this->notion->queryDatabase(
             NotionDatabaseId::CAPACITY->value,
             [
@@ -32,6 +33,7 @@ class SkillTreeController extends AbstractController
         );
         $rawCaps = $response['results'] ?? [];
 
+        // 3) Map IDs → Names
         $nameMap = [];
         foreach ($rawCaps as $cap) {
             $titles = $cap['properties']['Name']['title'] ?? [];
@@ -40,35 +42,53 @@ class SkillTreeController extends AbstractController
                 : 'UNKNOWN CAPACITY';
         }
 
+        // 4) Build nodes array
         $nodes = [];
         foreach ($rawCaps as $cap) {
-            // parse Position: expect "row,column"
-            $pos = $cap['properties']['Position']['rich_text'][0]['plain_text'] ?? '';
-            if (!preg_match('/^\s*(\d+)\s*,\s*(\d+)\s*$/', $pos, $m)) {
-                // skip invalid or missing
+            // Position parsing
+            $posText = $cap['properties']['Position']['rich_text'][0]['plain_text'] ?? '';
+            if (!preg_match('/^\s*(\d+)\s*,\s*(\d+)\s*$/', $posText, $m)) {
                 continue;
             }
-            [$_, $row, $col] = $m;
+            [, $row, $col] = $m;
 
-            $rels = $cap['properties']['Prérequis (Capacité)']['relation'] ?? [];
+            // Edges by Name lookup
             $edges = [];
-            foreach ($rels as $r) {
-                if (isset($nameMap[$r['id']])) {
-                    $edges[] = $nameMap[$r['id']];
+            foreach ($cap['properties']['Prérequis (Capacité)']['relation'] as $rel) {
+                if (isset($nameMap[$rel['id']])) {
+                    $edges[] = $nameMap[$rel['id']];
                 }
             }
 
+            // Cover URL or fallback
+            $cover = $cap['cover']['file']['url'] ?? 'https://placehold.co/150x150/png';
+
+            // Description
+            $descBlocks = $cap['properties']['Description']['rich_text'] ?? [];
+            $description = $descBlocks
+                ? $descBlocks[0]['plain_text']
+                : '';
+
+            // Cost and Type
+            $cost = $cap['properties']['Coût (PC)']['number'] ?? 0;
+            $type = $cap['properties']['Type']['select']['name'] ?? 'Unknown';
+
             $nodes[] = [
-                'name'  => $nameMap[$cap['id']],
-                'x'     => (int) $col,
-                'y'     => (int) $row,
-                'edges' => $edges,
+                'id'          => $cap['id'],
+                'name'        => $nameMap[$cap['id']],
+                'coverUrl'    => $cover,
+                'description' => $description,
+                'cost'        => $cost,
+                'type'        => $type,
+                'x'           => (int) $row,
+                'y'           => (int) $col,
+                'edges'       => $edges,
             ];
         }
 
         return $this->render('skilltree/index.html.twig', [
-            'skilltree_name' => $skilltreeName,
-            'nodes' => $nodes,
+            'skilltreeName' => $skilltreeName,
+            'nodes'         => $nodes,
         ]);
     }
 }

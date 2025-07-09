@@ -1,31 +1,35 @@
-{# templates/skilltree/index.html.twig #}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Skill Tree</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>Skill Tree – {{ skilltreeName }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50">
-    <h1 class="text-center text-xl font-bold my-4">{{ skilltree_name }}</h1>
 
-  <div id="graph" class="relative mx-auto p-4 bg-white">
-    <svg id="edges" class="absolute inset-0 pointer-events-none z-0"></svg>
-    <div id="node-grid" class="grid grid-cols-4 grid-rows-5 auto-rows-min gap-4">
-      {# Render each node with its grid position and data-edges #}
-      {% for n in nodes %}
-        <div
-          class="bg-white border-2 border-gray-800 rounded p-2 text-center text-xs z-10"
-          style="grid-column-start: {{ n.x }}; grid-row-start: {{ n.y }};"
-          data-edges="{{ n.edges|join(',') }}"
-          data-name="{{ n.name }}"
-        >
-          {{ n.name }}
+<body class="bg-gray-50">
+    <h1 class="text-center text-xl font-bold my-4">{{ skilltreeName }}</h1>
+
+    <div id="graph" class="relative mx-auto p-4 bg-white">
+        <svg id="edges" class="absolute inset-0 pointer-events-none z-0"></svg>
+        <div id="node-grid" class="grid grid-cols-4 grid-rows-5 auto-rows-min gap-4">
+            {% for n in nodes %}
+                <div
+                class="bg-white border-2 border-gray-800 rounded p-2 text-center text-xs z-10"
+                style="grid-row-start: {{ n.x }}; grid-column-start: {{ n.y }};"
+                data-name="{{ n.name }}"
+                data-edges="{{ n.edges|join(',') }}"
+                >
+                    <img src="{{ n.coverUrl }}" alt="" class="mx-auto mb-1 w-12 h-12 object-cover rounded"/>
+                    <strong class="block mb-1">{{ n.name }}</strong>
+                    <p class="text-[10px] mb-1">{{ n.type }} &middot; {{ n.cost }} PC</p>
+                    {% if n.description %}
+                        <p class="text-[9px] text-gray-600">{{ n.description }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
         </div>
-      {% endfor %}
     </div>
-  </div>
 
     {# Pass the node list into JS for edge-drawing #}
     <script>
