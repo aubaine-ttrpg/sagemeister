@@ -61,5 +61,15 @@ class NotionClient
         return $this->request('POST', "/databases/{$databaseId}/query", $query);
     }
 
-    // Add other endpoints as needed, e.g., pages(), search(), etc.
+    /**
+     * Fetch a single Notion page by its ID.
+     *
+     * @param string $pageId The Notion page ID (e.g. from a relation or query result).
+     * @return array The decoded JSON response for the page.
+     */
+    public function retrievePage(string $pageId): array
+    {
+        return $this->request('GET', "/pages/{$pageId}");
+    }
+
 }

@@ -1,9 +1,20 @@
 {# templates/skilltree/index.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Skill Tree{% endblock %}
+{% block title %}Skill Tree – {{ treeName }}{% endblock %}
 
 {% block body %}
-  <h1>Skill Tree</h1>
-  <p>This is the placeholder for your skill tree page.</p>
+  <h1>{{ treeName }}</h1>
+
+  <h2>Capacities</h2>
+  {% if capacities is empty %}
+    <p><em>No capacities found for this tree.</em></p>
+  {% else %}
+    <ul>
+      {% for cap in capacities %}
+        {% set titleBlocks = cap.properties.Name.title ?? [] %}
+        <li>{{ titleBlocks[0].plain_text|default(cap.id) }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
 {% endblock %}
