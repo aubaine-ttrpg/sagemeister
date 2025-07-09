@@ -1,0 +1,28 @@
+{# templates/notion/items.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Items in {{ dbName }}{% endblock %}
+
+{% block body %}
+  <h1>Items in <em>{{ dbName }}</em></h1>
+
+  {% if pages is empty %}
+    <p><em>No items found.</em></p>
+  {% else %}
+    <ul>
+      {% for page in pages %}
+        {% set titleBlocks = page.properties.Name.title ?? [] %}
+        <li>
+          <a href="{{ path('skilltree', { id: page.id }) }}">
+            {# Display the first title block if present, otherwise show the ID #}
+            {% if titleBlocks|length and titleBlocks[0].plain_text is not empty %}
+              {{ titleBlocks[0].plain_text }}
+            {% else %}
+              {{ page.id }}
+            {% endif %}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}
