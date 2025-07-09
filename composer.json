@@ -7,7 +7,6 @@
         "php": ">=8.2",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "brd6/notion-sdk-php": "^1.7",
         "nyholm/psr7": "^1.8",
         "symfony/console": "7.3.*",
         "symfony/dotenv": "7.3.*",
