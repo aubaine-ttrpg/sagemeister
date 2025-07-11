@@ -10,6 +10,18 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class SkillTreeController extends AbstractController
 {
+    private array $typeStyles = [
+        'Passif'                            => ['twColor'   => 'emerald',   'icon'  => 'tabler:hexagon-filled'],
+        'Action'                            => ['twColor'   => 'red',       'icon'  => 'material-symbols:circle'],
+        'Action Bonus'                      => ['twColor'   => 'amber',     'icon'  => 'carbon:circle-filled'],
+        'Réaction'                          => ['twColor'   => 'indigo',    'icon'  => 'material-symbols:square'],
+        'Évolution'                         => ['twColor'   => 'violet',    'icon'  => 'entypo:arrow-bold-up'],
+        'Amélioration de Caractéristiques'  => ['twColor'   => 'cyan',      'icon'  => 'octicon:sparkle-fill-24'],
+        'Karma'                             => ['twColor'   => 'pink',      'icon'  => 'si:sun-fill'],
+        // …add more type mappings here…
+        'Inconnue'                          => ['twColor'   => 'stone',     'icon'  => 'tabler:hexagon-filled'],
+    ];
+
     public function __construct(private NotionClient $notion) {}
 
     #[Route('/skilltree/{id}', name: 'skilltree')]
@@ -44,6 +56,9 @@ class SkillTreeController extends AbstractController
 
         // 4) Build nodes array
         $nodes = [];
+        $maxRow = 0;
+        $maxCol = 0;
+
         foreach ($rawCaps as $cap) {
             // Position parsing
             $posText = $cap['properties']['Position']['rich_text'][0]['plain_text'] ?? '';
@@ -51,6 +66,10 @@ class SkillTreeController extends AbstractController
                 continue;
             }
             [, $row, $col] = $m;
+
+            // update the max trackers
+            $maxRow = max($maxRow, (int)$row);
+            $maxCol = max($maxCol, (int)$col);
 
             // Edges by Name lookup
             $edges = [];
@@ -64,14 +83,29 @@ class SkillTreeController extends AbstractController
             $cover = $cap['cover']['file']['url'] ?? 'https://placehold.co/150x150/png';
 
             // Description
-            $descBlocks = $cap['properties']['Description']['rich_text'] ?? [];
-            $description = $descBlocks
-                ? $descBlocks[0]['plain_text']
-                : '';
+            $descBlocks  = $cap['properties']['Description']['rich_text'] ?? [];
+            $description = '';
+            foreach ($descBlocks as $blk) {
+                $text = htmlspecialchars($blk['plain_text'], ENT_QUOTES, 'UTF-8');
+
+                // wrap in <b> if bold
+                if (!empty($blk['annotations']['bold'])) {
+                    $text = "<b>{$text}</b>";
+                }
+
+                // wrap in <i> if italic
+                if (!empty($blk['annotations']['italic'])) {
+                    $text = "<i>{$text}</i>";
+                }
+
+                $description .= $text;
+            }
 
             // Cost and Type
             $cost = $cap['properties']['Coût (PC)']['number'] ?? 0;
             $type = $cap['properties']['Type']['select']['name'] ?? 'Unknown';
+
+            $style = $this->typeStyles[$type] ?? $this->typeStyles['Inconnue'];
 
             $nodes[] = [
                 'id'          => $cap['id'],
@@ -79,7 +113,8 @@ class SkillTreeController extends AbstractController
                 'coverUrl'    => $cover,
                 'description' => $description,
                 'cost'        => $cost,
-                'type'        => $type,
+                'color'       => $style['twColor'],
+                'iconKey'     => $style['icon'],
                 'x'           => (int) $row,
                 'y'           => (int) $col,
                 'edges'       => $edges,
@@ -87,7 +122,10 @@ class SkillTreeController extends AbstractController
         }
 
         return $this->render('skilltree/index.html.twig', [
+            'typeStyles'    => $this->typeStyles,
             'skilltreeName' => $skilltreeName,
+            'maxRows'       => $maxRow,
+            'maxCols'       => $maxCol,
             'nodes'         => $nodes,
         ]);
     }
